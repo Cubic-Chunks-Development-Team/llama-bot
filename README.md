@@ -13,9 +13,10 @@ First off, you're going to need to create an app, which you can do [here](https:
 ### Getting the bot to join your server
 After creating your app, you're going to want to the link below:
 
-    https://discordapp.com/oauth2/authorize?client_id=%3CCLIENT_ID%3E&scope=bot
+    https://discordapp.com/oauth2/authorize?client_id=%CLIENT_ID&scope=bot
     
-Once there, replace the <CLIENT_ID> with the Client ID from your app. Upon opening that page, it will ask you which server you want to put the bot into, and select your desired server. You're still not quite done, though! Now, you're going to want to go to token.txt, and paste in your bot token, which you can also find in the app page. Even after all of this, there's still a bit of work to do. Because Llama-Bot is a moderation bot, you're going to have a few channels/roles that will be used to make sure the player is punished for spam.
+Once there, replace the CLIENT_ID with the Client ID from your app. Upon opening that page, it will ask you which server you want to put the bot into, and select your desired server. You're still not quite done, though! Now, you're going to want to go to token.txt, and paste in your bot token, which you can also find in the app page. Even after all of this, there's still a bit of work to do. Because Llama-Bot is a moderation bot, you're going to have a few channels/roles that will be used to make sure the player is punished for spam.
+
     TIMEOUT_ROLE_ID: "ROLE_ID"
     Role to use for spam-prevention role.
     
