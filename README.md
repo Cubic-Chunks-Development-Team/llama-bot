@@ -18,16 +18,16 @@ https://discordapp.com/oauth2/authorize?client_id=<CLIENT_ID>&scope=bot
 Once there, replace the <CLIENT_ID> with the Client ID from your app. Upon opening that page, it will ask you which server you want to put the bot into, and select your desired server. You're still not quite done, though! Now, you're going to want to go to token.txt, and paste in your bot token, which you can also find in the app page. Even after all of this, there's still a bit of work to do. Because Llama-Bot is a moderation bot, you're going to have a few channels/roles that will be used to make sure the player is punished for spam.
 '''
 TIMEOUT_ROLE_ID: "ROLE_ID"
-# Role to use for spam-prevention role.
+Role to use for spam-prevention role.
 
 TIMEOUT_CHANNEL_ID: "CHANNEL_ID"
-# Channel to use for redirection of spammers.
+Channel to use for redirection of spammers.
 
 HEAVY_TIMEOUT_ROLE_ID: "ROLE_ID"
-# If the role fails, secondary role will mute spammers.
+If the role fails, secondary role will mute spammers.
 
 SERVER_ID: "SERVER_ID"
-# Server ID for the bot.
+Server ID for the bot.
 '''
 ### Launching the bot
 All you need to do now is open up the bot.py provided in the file you downloaded. The bot will be on your server in no time ready to send some kiddos to the timeout corner!
