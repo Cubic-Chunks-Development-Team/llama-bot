@@ -1,7 +1,7 @@
 # The Llama-Bot
 The Llama-Bot is a bot developed and designed by the Cubic Chunks Development Team. Unlike most bots, ours is open-source, which lets you customize it all you want to name the bot to how the bot will function.
 
-## Small Warning
+### Small Warning
 You will need to have Python installed with pip and discord.py before getting the bot onto your server!
 
 ## Getting Started
