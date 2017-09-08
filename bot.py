@@ -1,10 +1,43 @@
 import discord
 import asyncio
+import json
+import time
+import threading
 
 client = discord.Client()
 
-tfile = open("token.txt", "r")
-token = tfile.read()
+token = ""
+
+TIMEOUT_ROLE_ID = ""
+TIMEOUT_CHANNEL_ID = ""
+HEAVY_TIMEOUT_ROLE_ID = ""
+SERVER_ID = ""
+
+def loadConfig():
+	tfile = open("token.txt", "r")
+	
+	global token
+	token = tfile.read()
+	
+	tfile.close()
+	print(token)
+
+	configfile = open("config.txt", "r")
+	configtext =  configfile.read()
+	configfile.close()
+
+	confKVPairs = json.loads(configtext)
+	
+	global TIMEOUT_ROLE_ID
+	global TIMEOUT_CHANNEL_ID
+	global HEAVY_TIMEOUT_ROLE_ID
+	global SERVER_ID
+	
+	TIMEOUT_ROLE_ID = confKVPairs["TIMEOUT_ROLE_ID"]
+	TIMEOUT_CHANNEL_ID = confKVPairs["TIMEOUT_CHANNEL_ID"]
+	HEAVY_TIMEOUT_ROLE_ID = confKVPairs["HEAVY_TIMEOUT_ROLE_ID"]
+	SERVER_ID = confKVPairs["SERVER_ID"]
+
 
 @client.event
 async def on_ready():
@@ -15,13 +48,25 @@ async def on_ready():
 
 @client.event
 async def on_message(message):
-	await client.send_message(message.channel, "Hello world")
+	if message.author.bot:
+		return
+	if message.channel.id == SERVER_ID:
+		return
 
+def doLoop():
+	while True:
+		time.sleep(0.1)
+
+loadConfig()
 client.run(token)
+
+mainThread = threading.Thread(None, doLoop, "timingloop")
+
+mainThread.start()
 
 
 # Note: Code beyond this line was written in JavaScript and has not been ported.
-
+'''
 client.on("message", (message) => {
 	if (message.author.bot)
 		return;
@@ -105,3 +150,4 @@ client.on("message", (message) => {
 		}
 	}
 });
+'''
