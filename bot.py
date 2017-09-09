@@ -4,6 +4,16 @@ import json
 import time
 import threading
 
+class UserEntry:
+
+	def __init__(self, user_in):
+		self.user = user_in
+		self.cooldown = 0
+		self.punishment = False
+		self.heavyPunishment = False
+		self.punishmentTimeLeft = 0
+
+
 client = discord.Client()
 
 token = ""
@@ -12,6 +22,8 @@ TIMEOUT_ROLE_ID = ""
 TIMEOUT_CHANNEL_ID = ""
 HEAVY_TIMEOUT_ROLE_ID = ""
 SERVER_ID = ""
+
+userdata = {}
 
 def loadConfig():
 	tfile = open("token.txt", "r")
@@ -36,11 +48,19 @@ def loadConfig():
 	TIMEOUT_ROLE_ID = confKVPairs["TIMEOUT_ROLE_ID"]
 	TIMEOUT_CHANNEL_ID = confKVPairs["TIMEOUT_CHANNEL_ID"]
 	HEAVY_TIMEOUT_ROLE_ID = confKVPairs["HEAVY_TIMEOUT_ROLE_ID"]
-	SERVER_ID = confKVPairs["SERVER_ID"]
+	SERVER_ID = str(confKVPairs["SERVER_ID"])
 
+def setupRoles():
+	global TIMEOUT_ROLE
+	global HEAVY_TIMEOUT_ROLE
+	global TIMEOUT_CHANNEL
+	TIMEOUT_ROLE = discord.utils.find(lambda s: s.id == TIMEOUT_ROLE_ID, client.get_server(SERVER_ID).roles)
+	HEAVY_TIMEOUT_ROLE = discord.utils.find(lambda s: s.id == HEAVY_TIMEOUT_ROLE_ID, client.get_server(SERVER_ID).roles)
+	TIMEOUT_CHANNEL = client.get_channel(TIMEOUT_CHANNEL_ID)
 
 @client.event
 async def on_ready():
+	setupRoles()
 	print('Logged in as')
 	print(client.user.name)
 	print(client.user.id)
@@ -48,21 +68,57 @@ async def on_ready():
 
 @client.event
 async def on_message(message):
+	global TIMEOUT_ROLE_ID
 	if message.author.bot:
 		return
-	if message.channel.id == SERVER_ID:
-		return
+	if message.server.id == SERVER_ID:
+		if (not (message.author.id in userdata)):
+			userdata[message.author.id] = UserEntry(message.author)
+		if (userdata[message.author.id].punishment):
+			await client.send_message(TIMEOUT_CHANNEL, message.author.name + ", you still have " + str(userdata[message.author.id].punishmentTimeLeft) + " units of time left")
+		userdata[message.author.id].cooldown += 15
+		if (userdata[message.author.id].cooldown > 50):
+			if (userdata[message.author.id].punishment):
+				userdata[message.author.id].heavyPunishment = True
+				await client.add_roles(message.author, HEAVY_TIMEOUT_ROLE)
+			else:
+				await client.send_message(message.channel, ":exclamation: :exclamation: :regional_indicator_s: :regional_indicator_p: :regional_indicator_a: :regional_indicator_m:     :regional_indicator_d: :regional_indicator_e: :regional_indicator_t: :regional_indicator_e: :regional_indicator_c: :regional_indicator_t: :regional_indicator_e: :regional_indicator_d: :exclamation: :exclamation:")
+				await client.add_roles(message.author, TIMEOUT_ROLE)
+				userdata[message.author.id].punishment = True
+			userdata[message.author.id].punishmentTimeLeft = 450
 
-def doLoop():
+
+async def doLoop():
 	while True:
-		time.sleep(0.1)
+		await asyncio.sleep(0.1)
+#		print("test")
+		for u in userdata:
+			if (userdata[u].cooldown > 0):
+				userdata[u].cooldown -= 1
+			userdata[u].punishmentTimeLeft -= 1
+			if (userdata[u].punishmentTimeLeft == 0):
+				if (userdata[u].heavyPunishment):
+					userdata[u].heavyPunishment = False
+					userdata[u].punishmentTimeLeft = 45
+					await client.remove_roles(userdata[u].user, HEAVY_TIMEOUT_ROLE)
+				else:
+					userdata[u].punishment = False
+					await client.remove_roles(userdata[u].user, TIMEOUT_ROLE)
+				await client.send_message(TIMEOUT_CHANNEL, "End")
+			elif (userdata[u].punishmentTimeLeft < 0):
+				userdata[u].punishmentTimeLeft = 0
 
 loadConfig()
+
+#mainThread = threading.Thread(None, doLoop, "timingloop")
+#mainThread.start()
+loop = asyncio.get_event_loop()
+# Blocking call which returns when the display_date() coroutine is done
+loop.run_until_complete(asyncio.gather(doLoop(), client.start(token),))
+loop.close()
+
 client.run(token)
 
-mainThread = threading.Thread(None, doLoop, "timingloop")
-
-mainThread.start()
 
 
 # Note: Code beyond this line was written in JavaScript and has not been ported.

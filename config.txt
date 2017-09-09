@@ -9,7 +9,7 @@
 "HEAVY_TIMEOUT_ROLE_ID": "354329328688955392",
 
 "comment": "Role that will bypass spam-prevention actions.",
-"TIMEOUT_BYPASS_ROLE_ID": "000000000000000000"
+"TIMEOUT_BYPASS_ROLE_ID": "000000000000000000",
 
 "comment": "Server ID for the bot.",
 "SERVER_ID": "331900978548965376"
