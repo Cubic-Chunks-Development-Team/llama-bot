@@ -2,18 +2,23 @@ import discord
 import asyncio
 import json
 import time
-import threading
 import configparser
+import math
 
 class UserEntry:
-
 	def __init__(self, user_in):
 		self.user = user_in
 		self.cooldown = 0
+		self.slowcooldown = 0
 		self.punishment = False
 		self.heavyPunishment = False
 		self.punishmentTimeLeft = 0
 
+class Quote:
+	def __init__(self, text_in, author_in, timestamp_in):
+		self.text = text_in
+		self.author = author_in
+		self.timestamp = timestamp_in
 
 client = discord.Client()
 
@@ -24,6 +29,16 @@ TIMEOUT_CHANNEL_ID = ""
 HEAVY_TIMEOUT_ROLE_ID = ""
 SERVER_ID = ""
 TIMEOUT_BYPASS_ROLE_ID = ""
+
+TimeoutDuration = 0
+HeavyTimeoutDuration = 0
+NewlineWeight = 0
+CharacterWeight = 0
+FastTimerMultiplier = 0
+FastTimerThreshold = 0
+SlowTimerMultiplier = 0
+SlowTimerThreshold = 0
+
 
 userdata = {}
 
@@ -53,6 +68,24 @@ def loadConfig():
 	HEAVY_TIMEOUT_ROLE_ID = config["llama-bot"]["HEAVY_TIMEOUT_ROLE_ID"]
 	SERVER_ID = config["llama-bot"]["SERVER_ID"]
 	TIMOUT_BYPASS_ROLE_ID = config["llama-bot"]["TIMEOUT_BYPASS_ROLE_ID"]
+	
+	global TimeoutDuration
+	global HeavyTimeoutDuration
+	global NewlineWeight
+	global CharacterWeight
+	global FastTimerMultiplier
+	global FastTimerThreshold
+	global SlowTimerMultiplier
+	global SlowTimerThreshold
+	
+	TimeoutDuration = int(config["llama-bot"]["TimeoutDuration"])
+	HeavyTimeoutDuration = int(config["llama-bot"]["HeavyTimeoutDuration"])
+	NewlineWeight = float(config["llama-bot"]["NewlineWeight"])
+	CharacterWeight = float(config["llama-bot"]["CharacterWeight"])
+	FastTimerMultiplier = int(config["llama-bot"]["FastTimerMultiplier"])
+	FastTimerThreshold = int(config["llama-bot"]["FastTimerThreshold"])
+	SlowTimerMultiplier = int(config["llama-bot"]["SlowTimerMultiplier"])
+	SlowTimerThreshold = int(config["llama-bot"]["SlowTimerThreshold"])
 
 def setupRoles():
 	global TIMEOUT_ROLE
@@ -74,148 +107,86 @@ async def on_ready():
 
 @client.event
 async def on_message(message):
-	global TIMEOUT_ROLE_ID
+
 	if message.author.bot:
 		return
-	if message.author.top_role == TIMEOUT_BYPASS_ROLE:
-		return
+
 	if message.server.id == SERVER_ID:
+
+		if (message.content.startswith("$")):
+			args = message.content.split(" ")
+			if (args[0] == "$ping"):
+				await client.send_message(message.channel, "pong")
+			if (args[0] == "$quote"):
+				await client.send_message(message.channel, "todo")
+			return
+				
+		if not (TIMEOUT_BYPASS_ROLE is None) and TIMEOUT_BYPASS_ROLE in message.author.roles:
+			return
+			
 		if (not (message.author.id in userdata)):
 			userdata[message.author.id] = UserEntry(message.author)
+			
 		if (userdata[message.author.id].punishment):
 			await client.send_message(TIMEOUT_CHANNEL, getFormattedMessage("PunishmentTime", message.author.name, userdata[message.author.id].punishmentTimeLeft*0.1))
-		userdata[message.author.id].cooldown += 15
-		if (userdata[message.author.id].cooldown > 50):
+			
+		lines = message.content.count("\n")
+		score = (lines * NewlineWeight + len(message.content) * CharacterWeight) + 1.0
+		userdata[message.author.id].cooldown += (FastTimerMultiplier * score)
+		userdata[message.author.id].slowcooldown += (SlowTimerMultiplier * score)
+			
+		if (userdata[message.author.id].cooldown > FastTimerThreshold or userdata[message.author.id].slowcooldown > SlowTimerThreshold):
+			
 			if (userdata[message.author.id].punishment):
 				userdata[message.author.id].heavyPunishment = True
 				await client.add_roles(message.author, HEAVY_TIMEOUT_ROLE)
 				await client.send_message(TIMEOUT_CHANNEL, getFormattedMessage("HeavyPunishmentStart", message.author.name))
+				userdata[message.author.id].punishmentTimeLeft = HeavyTimeoutDuration * 10
+				
 			else:
 				await client.send_message(message.channel, getFormattedMessage("SpamAlert"))
 				await client.add_roles(message.author, TIMEOUT_ROLE)
 				userdata[message.author.id].punishment = True
 				await client.send_message(TIMEOUT_CHANNEL, getFormattedMessage("PunishmentStart", message.author.name))
-			userdata[message.author.id].punishmentTimeLeft = 450
+				userdata[message.author.id].punishmentTimeLeft = TimeoutDuration * 10
+				
 			userdata[message.author.id].cooldown = 0
+			userdata[message.author.id].slowcooldown = 0
 
 
 async def doLoop():
+
 	while True:
+
 		await asyncio.sleep(0.1)
-#		print("test")
-		for u in userdata:
+		for u in userdata.copy():
+
 			if (userdata[u].cooldown > 0):
 				userdata[u].cooldown -= 1
+			if (userdata[u].slowcooldown > 0):
+				userdata[u].slowcooldown -= 1
+				
 			userdata[u].punishmentTimeLeft -= 1
+				
 			if (userdata[u].punishmentTimeLeft == 0):
+				
 				if (userdata[u].heavyPunishment):
 					userdata[u].heavyPunishment = False
-					userdata[u].punishmentTimeLeft = 45
+					userdata[u].punishmentTimeLeft = TimeoutDuration * 10
 					await client.remove_roles(userdata[u].user, HEAVY_TIMEOUT_ROLE)
 					await client.send_message(TIMEOUT_CHANNEL, getFormattedMessage("HeavyPunishmentEnd", userdata[u].user.name))
+					
 				else:
 					userdata[u].punishment = False
 					await client.remove_roles(userdata[u].user, TIMEOUT_ROLE)
 					await client.send_message(TIMEOUT_CHANNEL, getFormattedMessage("PunishmentEnd", userdata[u].user.name))
+					
 			elif (userdata[u].punishmentTimeLeft < 0):
 				userdata[u].punishmentTimeLeft = 0
 
+
 loadConfig()
-
-#mainThread = threading.Thread(None, doLoop, "timingloop")
-#mainThread.start()
 loop = asyncio.get_event_loop()
-# Blocking call which returns when the display_date() coroutine is done
-loop.run_until_complete(asyncio.gather(doLoop(), client.start(token),))
+loop.run_until_complete(asyncio.gather(doLoop(), client.start(token)))
 loop.close()
-
 client.run(token)
-
-
-
-# Note: Code beyond this line was written in JavaScript and has not been ported.
-'''
-client.on("message", (message) => {
-	if (message.author.bot)
-		return;
-	if (message.guild != null && message.guild.id == SERVER_ID) {
-
-		if (message.content == "ping") {
-			message.channel.send("Pong begin");
-		// Usage!
-		sleep(4000).then(() => {
-			message.channel.send("Pong end");
-		});
-		
-		}
-	
-	
-		date = new Date();
-		timerinfo = info[message.author.id];
-		if (timerinfo == undefined)
-			timerinfo = { lasttime: date.getTime(), totaltime: 0, punishment: false, completiontime: 0, heavypunishment: false }
-		var t = date.getTime();
-		timerinfo.totaltime += (2000 - (t - timerinfo.lasttime));
-		timerinfo.lasttime = t;
-		if (timerinfo.totaltime < 0) timerinfo.totaltime = 0;
-		
-		
-		if (timerinfo.heavypunishment) {
-			message.channel.send(message.author.username + ", you are muted.");
-			message.delete();
-			return;
-		}
-		
-		if (timerinfo.punishment) {
-			if (date.getTime() > timerinfo.completiontime) {
-				message.member.removeRole(TIMEOUT_ROLE_ID, "SPAM");
-				message.channel.send(message.author.username + ", I'm letting you go now.");
-				timerinfo.punishment = false;
-				message.member.setMute(false);
-			} else {
-				message.channel.send(message.author.username + ", you still have " + (0.001 * (timerinfo.completiontime - date.getTime())) + " seconds left in the time out corner.");
-			}
-		}
-		
-		if (timerinfo.totaltime > 8000) {
-			timerinfo.totaltime = 0;
-			message.channel.send(":exclamation: :exclamation: :regional_indicator_s: :regional_indicator_p: :regional_indicator_a: :regional_indicator_m:     :regional_indicator_d: :regional_indicator_e: :regional_indicator_t: :regional_indicator_e: :regional_indicator_c: :regional_indicator_t: :regional_indicator_e: :regional_indicator_d: :exclamation: :exclamation:");
-			client.channels.get(TIMEOUT_CHANNEL_ID).send(":exclamation: :exclamation: :regional_indicator_s: :regional_indicator_p: :regional_indicator_a: :regional_indicator_m:     :regional_indicator_d: :regional_indicator_e: :regional_indicator_t: :regional_indicator_e: :regional_indicator_c: :regional_indicator_t: :regional_indicator_e: :regional_indicator_d: :exclamation: :exclamation:");
-			
-			if (timerinfo.punishment) {
-				client.channels.get(TIMEOUT_CHANNEL_ID).send(message.author.username + ", I can't believe this. Spamming in the thinking corner? I'l sorry to say I'll have to mute you.");
-				
-				sleep(2000).then(() => {
-					message.member.addRole(HEAVY_TIMEOUT_ROLE_ID, "SPAM");
-				});
-				
-				timerinfo.heavypunishment = true;
-				info[message.author.id] = timerinfo;
-				sleep(90000).then(() => {
-					timerinfo.heavypunishment = false;
-					message.member.removeRole(HEAVY_TIMEOUT_ROLE_ID, "SPAM");
-					client.channels.get(TIMEOUT_CHANNEL_ID).send(message.author.username + ", I've unmuted you, but you still need to be in the timeout corner a bit.");
-					timerinfo.completiontime = date.getTime() + 45000;
-					timerinfo.punishment = true;
-					info[message.author.id] = timerinfo;
-					message.member.addRole(TIMEOUT_ROLE_ID, "SPAM");
-				});
-			}
-			else {
-				client.channels.get(TIMEOUT_CHANNEL_ID).send(message.author.username + ", you have spammed too much. You need to go think about your actions a bit.");
-			}
-			timerinfo.completiontime = date.getTime() + 45000;
-			
-			timerinfo.punishment = true;
-			sleep(2000).then(() => {
-				message.member.addRole(TIMEOUT_ROLE_ID, "SPAM");
-			});
-		}
-		info[message.author.id] = timerinfo;
-	} else if (message.channel instanceof Discord.DMChannel) {
-		if (message.channel.recipient.id == "125612588271665152") {
-			client.channels.get("331900978548965376").send(message.content);
-		}
-	}
-});
-'''

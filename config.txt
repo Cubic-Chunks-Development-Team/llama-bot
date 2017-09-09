@@ -15,6 +15,14 @@ TIMEOUT_BYPASS_ROLE_ID = 000000000000000000
 # Server ID for the bot.
 SERVER_ID = 331900978548965376
 
+TimeoutDuration = 45
+HeavyTimeoutDuration = 45
+NewlineWeight = 0.3333
+CharacterWeight = 0.02
+FastTimerMultiplier = 12
+FastTimerThreshold = 50
+SlowTimerMultiplier = 40
+SlowTimerThreshold = 600
 
 [lang]
 
