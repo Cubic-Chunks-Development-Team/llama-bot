@@ -26,22 +26,20 @@ After creating your app, you're going to want to the link below:
     
 Once there, replace the <CLIENT_ID> with the Client ID from your app. Upon opening that page, it will ask you which server you want to put the bot into, and select your desired server. You're still not quite done, though! Now, you're going to want to go to token.txt, and paste in your bot token, which you can also find in the app page. Even after all of this, there's still a bit of work to do. Because Llama-Bot is a moderation bot, you're going to have a few channels/roles that will be used to make sure the player is punished for spam. The following below is what you'll see in your config.txt.
 
-'''
-"comment": "Role to use for spam-prevention role.",
-"TIMEOUT_ROLE_ID": "000000000000000000",
+    "comment": "Role to use for spam-prevention role.",
+    "TIMEOUT_ROLE_ID": "000000000000000000",
 
-"comment": "Channel to use for redirection of spammers.",
-"TIMEOUT_CHANNEL_ID": "000000000000000000",
+    "comment": "Channel to use for redirection of spammers.",
+    "TIMEOUT_CHANNEL_ID": "000000000000000000",
 
-"comment": "If the role fails, secondary role will mute spammers.",
-"HEAVY_TIMEOUT_ROLE_ID": "000000000000000000",
+    "comment": "If the role fails, secondary role will mute spammers.",
+    "HEAVY_TIMEOUT_ROLE_ID": "000000000000000000",
 
-"comment": "Role that will bypass spam-prevention actions.",
-"TIMEOUT_BYPASS_ROLE_ID": "000000000000000000",
+    "comment": "Role that will bypass spam-prevention actions.",
+    "TIMEOUT_BYPASS_ROLE_ID": "000000000000000000",
 
-"comment": "Server ID for the bot.",
-"SERVER_ID": "000000000000000000"
-'''
+    "comment": "Server ID for the bot.",
+    "SERVER_ID": "000000000000000000"
 
 After you fill in the following information, then you can start your bot.
 
