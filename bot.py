@@ -22,6 +22,7 @@ TIMEOUT_ROLE_ID = ""
 TIMEOUT_CHANNEL_ID = ""
 HEAVY_TIMEOUT_ROLE_ID = ""
 SERVER_ID = ""
+TIMEOUT_BYPASS_ROLE_ID = ""
 
 userdata = {}
 
@@ -44,19 +45,23 @@ def loadConfig():
 	global TIMEOUT_CHANNEL_ID
 	global HEAVY_TIMEOUT_ROLE_ID
 	global SERVER_ID
+	global TIMEOUT_BYPASS_ROLE_ID
 	
 	TIMEOUT_ROLE_ID = confKVPairs["TIMEOUT_ROLE_ID"]
 	TIMEOUT_CHANNEL_ID = confKVPairs["TIMEOUT_CHANNEL_ID"]
 	HEAVY_TIMEOUT_ROLE_ID = confKVPairs["HEAVY_TIMEOUT_ROLE_ID"]
 	SERVER_ID = str(confKVPairs["SERVER_ID"])
+	TIMEOUT_BYPASS_ROLE_ID = confKVPairs["TIMEOUT_BYPASS_ROLE_ID"]
 
 def setupRoles():
 	global TIMEOUT_ROLE
 	global HEAVY_TIMEOUT_ROLE
 	global TIMEOUT_CHANNEL
+	global TIMEOUT_BYPASS_ROLE
 	TIMEOUT_ROLE = discord.utils.find(lambda s: s.id == TIMEOUT_ROLE_ID, client.get_server(SERVER_ID).roles)
 	HEAVY_TIMEOUT_ROLE = discord.utils.find(lambda s: s.id == HEAVY_TIMEOUT_ROLE_ID, client.get_server(SERVER_ID).roles)
 	TIMEOUT_CHANNEL = client.get_channel(TIMEOUT_CHANNEL_ID)
+	TIMEOUT_BYPASS_ROLE = discord.utils.find(lambda s: s.id == TIMEOUT_BYPASS_ROLE_ID, client.get_server(SERVER_ID).roles)
 
 @client.event
 async def on_ready():
@@ -70,6 +75,8 @@ async def on_ready():
 async def on_message(message):
 	global TIMEOUT_ROLE_ID
 	if message.author.bot:
+		return
+	if message.author.top_role == TIMEOUT_BYPASS_ROLE:
 		return
 	if message.server.id == SERVER_ID:
 		if (not (message.author.id in userdata)):
