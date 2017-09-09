@@ -3,6 +3,7 @@ import asyncio
 import json
 import time
 import threading
+import configparser
 
 class UserEntry:
 
@@ -26,20 +27,20 @@ TIMEOUT_BYPASS_ROLE_ID = ""
 
 userdata = {}
 
+def getFormattedMessage(id, *args):
+	return config["lang"][id] % args
+
 def loadConfig():
 	tfile = open("token.txt", "r")
 	
 	global token
 	token = tfile.read()
-	
 	tfile.close()
 	print(token)
 
-	configfile = open("config.txt", "r")
-	configtext =  configfile.read()
-	configfile.close()
-
-	confKVPairs = json.loads(configtext)
+	global config
+	config = configparser.ConfigParser()
+	config.read("config.txt")
 	
 	global TIMEOUT_ROLE_ID
 	global TIMEOUT_CHANNEL_ID
@@ -47,11 +48,11 @@ def loadConfig():
 	global SERVER_ID
 	global TIMEOUT_BYPASS_ROLE_ID
 	
-	TIMEOUT_ROLE_ID = confKVPairs["TIMEOUT_ROLE_ID"]
-	TIMEOUT_CHANNEL_ID = confKVPairs["TIMEOUT_CHANNEL_ID"]
-	HEAVY_TIMEOUT_ROLE_ID = confKVPairs["HEAVY_TIMEOUT_ROLE_ID"]
-	SERVER_ID = str(confKVPairs["SERVER_ID"])
-	TIMEOUT_BYPASS_ROLE_ID = confKVPairs["TIMEOUT_BYPASS_ROLE_ID"]
+	TIMEOUT_ROLE_ID = config["llama-bot"]["TIMEOUT_ROLE_ID"]
+	TIMEOUT_CHANNEL_ID = config["llama-bot"]["TIMEOUT_CHANNEL_ID"]
+	HEAVY_TIMEOUT_ROLE_ID = config["llama-bot"]["HEAVY_TIMEOUT_ROLE_ID"]
+	SERVER_ID = config["llama-bot"]["SERVER_ID"]
+	TIMOUT_BYPASS_ROLE_ID = config["llama-bot"]["TIMEOUT_BYPASS_ROLE_ID"]
 
 def setupRoles():
 	global TIMEOUT_ROLE
@@ -82,17 +83,20 @@ async def on_message(message):
 		if (not (message.author.id in userdata)):
 			userdata[message.author.id] = UserEntry(message.author)
 		if (userdata[message.author.id].punishment):
-			await client.send_message(TIMEOUT_CHANNEL, message.author.name + ", you still have " + str(userdata[message.author.id].punishmentTimeLeft) + " units of time left")
+			await client.send_message(TIMEOUT_CHANNEL, getFormattedMessage("PunishmentTime", message.author.name, userdata[message.author.id].punishmentTimeLeft*0.1))
 		userdata[message.author.id].cooldown += 15
 		if (userdata[message.author.id].cooldown > 50):
 			if (userdata[message.author.id].punishment):
 				userdata[message.author.id].heavyPunishment = True
 				await client.add_roles(message.author, HEAVY_TIMEOUT_ROLE)
+				await client.send_message(TIMEOUT_CHANNEL, getFormattedMessage("HeavyPunishmentStart", message.author.name))
 			else:
-				await client.send_message(message.channel, ":exclamation: :exclamation: :regional_indicator_s: :regional_indicator_p: :regional_indicator_a: :regional_indicator_m:     :regional_indicator_d: :regional_indicator_e: :regional_indicator_t: :regional_indicator_e: :regional_indicator_c: :regional_indicator_t: :regional_indicator_e: :regional_indicator_d: :exclamation: :exclamation:")
+				await client.send_message(message.channel, getFormattedMessage("SpamAlert"))
 				await client.add_roles(message.author, TIMEOUT_ROLE)
 				userdata[message.author.id].punishment = True
+				await client.send_message(TIMEOUT_CHANNEL, getFormattedMessage("PunishmentStart", message.author.name))
 			userdata[message.author.id].punishmentTimeLeft = 450
+			userdata[message.author.id].cooldown = 0
 
 
 async def doLoop():
@@ -108,10 +112,11 @@ async def doLoop():
 					userdata[u].heavyPunishment = False
 					userdata[u].punishmentTimeLeft = 45
 					await client.remove_roles(userdata[u].user, HEAVY_TIMEOUT_ROLE)
+					await client.send_message(TIMEOUT_CHANNEL, getFormattedMessage("HeavyPunishmentEnd", userdata[u].user.name))
 				else:
 					userdata[u].punishment = False
 					await client.remove_roles(userdata[u].user, TIMEOUT_ROLE)
-				await client.send_message(TIMEOUT_CHANNEL, "End")
+					await client.send_message(TIMEOUT_CHANNEL, getFormattedMessage("PunishmentEnd", userdata[u].user.name))
 			elif (userdata[u].punishmentTimeLeft < 0):
 				userdata[u].punishmentTimeLeft = 0
 
