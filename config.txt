@@ -1,16 +1,16 @@
-{
-"comment": "Role to use for spam-prevention role.",
-"TIMEOUT_ROLE_ID": "354313345979121664",
+[llama-bot]
 
-"comment": "Channel to use for redirection of spammers.",
-"TIMEOUT_CHANNEL_ID": "354312520447688704",
+# Role to use for spam-prevention role.
+TIMEOUT_ROLE_ID = 354313345979121664
 
-"comment": "If the role fails, secondary role will mute spammers.",
-"HEAVY_TIMEOUT_ROLE_ID": "354329328688955392",
+# Channel to use for redirection of spammers.
+TIMEOUT_CHANNEL_ID = 354312520447688704
 
-"comment": "Role that will bypass spam-prevention actions.",
-"TIMEOUT_BYPASS_ROLE_ID": "000000000000000000",
+# If the role fails, secondary role will mute spammers.
+HEAVY_TIMEOUT_ROLE_ID = 354329328688955392
 
-"comment": "Server ID for the bot.",
-"SERVER_ID": "331900978548965376"
-}
+# Role that will bypass spam-prevention actions.
+TIMEOUT_BYPASS_ROLE_ID = 000000000000000000
+
+# Server ID for the bot.
+SERVER_ID = 331900978548965376

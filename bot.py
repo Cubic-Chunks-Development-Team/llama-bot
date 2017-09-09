@@ -3,6 +3,7 @@ import asyncio
 import json
 import time
 import threading
+import configparser
 
 class UserEntry:
 
@@ -31,15 +32,11 @@ def loadConfig():
 	
 	global token
 	token = tfile.read()
-	
 	tfile.close()
 	print(token)
 
-	configfile = open("config.txt", "r")
-	configtext =  configfile.read()
-	configfile.close()
-
-	confKVPairs = json.loads(configtext)
+	config = configparser.ConfigParser()
+	config.read("config.txt")
 	
 	global TIMEOUT_ROLE_ID
 	global TIMEOUT_CHANNEL_ID
@@ -47,11 +44,11 @@ def loadConfig():
 	global SERVER_ID
 	global TIMEOUT_BYPASS_ROLE_ID
 	
-	TIMEOUT_ROLE_ID = confKVPairs["TIMEOUT_ROLE_ID"]
-	TIMEOUT_CHANNEL_ID = confKVPairs["TIMEOUT_CHANNEL_ID"]
-	HEAVY_TIMEOUT_ROLE_ID = confKVPairs["HEAVY_TIMEOUT_ROLE_ID"]
-	SERVER_ID = str(confKVPairs["SERVER_ID"])
-	TIMEOUT_BYPASS_ROLE_ID = confKVPairs["TIMEOUT_BYPASS_ROLE_ID"]
+	TIMEOUT_ROLE_ID = config["llama-bot"]["TIMEOUT_ROLE_ID"]
+	TIMEOUT_CHANNEL_ID = config["llama-bot"]["TIMEOUT_CHANNEL_ID"]
+	HEAVY_TIMEOUT_ROLE_ID = config["llama-bot"]["HEAVY_TIMEOUT_ROLE_ID"]
+	SERVER_ID = config["llama-bot"]["SERVER_ID"]
+	TIMEOUT_BYPASS_ROLE_ID = config["llama-bot"]["TIMEOUT_BYPASS_ROLE_ID"]
 
 def setupRoles():
 	global TIMEOUT_ROLE
