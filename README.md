@@ -51,3 +51,23 @@ There are more options further below in the config, but you can learn about how 
 
 ### Launching the bot
 All you need to do now is open up the bot.py provided in the file you downloaded. The bot will be on your server in no time ready to send some kiddos to the timeout corner!
+
+### Versions and Downloads
+
+#### v0.34
+LATEST VERSION
+(link)
+
+#### LEGACY VERSIONS
+
+##### v0.33
+(link)
+
+##### v0.32
+(link)
+
+##### v0.31
+(link)
+
+##### v0.30
+(link)
