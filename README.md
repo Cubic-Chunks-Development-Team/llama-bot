@@ -25,7 +25,7 @@ Introducing: The LlamaBot. The Llama-Bot is an open-source Discord bot developed
 ### v0.32
 
 #### What's new in v0.32?
-* Merge pull request #12
+* Merge pull request [#12](https://github.com/Cubic-Chunks-Development-Team/llama-bot/pull/12)
 #### Download:
 
 [![Version v0.32](https://travis-ci.org/dwyl/esta.svg?branch=master)](https://github.com/Cubic-Chunks-Development-Team/llama-bot/releases/tag/v0.32)
