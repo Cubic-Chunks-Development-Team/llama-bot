@@ -5,16 +5,32 @@ Introducing: The LlamaBot. The Llama-Bot is an open-source Discord bot developed
 
 ### v0.34
 
-[![Latest Stable Version](https://travis-ci.org/dwyl/esta.svg?branch=master)](https://github.com/Cubic-Chunks-Development-Team/llama-bot/archive/v0.34.zip)
+#### What's new in v0.34?
+* Added License: MIT
+#### Download:
 
+[![Latest Stable Version](https://travis-ci.org/dwyl/esta.svg?branch=master)](https://github.com/Cubic-Chunks-Development-Team/llama-bot/releases/tag/v0.34)
+
+---
 ### v0.33
 
-[![Version v0.33](https://travis-ci.org/dwyl/esta.svg?branch=master)](https://github.com/Cubic-Chunks-Development-Team/llama-bot/archive/v0.33.zip)
+#### What's new in v0.33?
+* Configuration files relocated.
+* You can now customize spam-prevention protocols.
+#### Download:
 
+[![Version v0.33](https://travis-ci.org/dwyl/esta.svg?branch=master)](https://github.com/Cubic-Chunks-Development-Team/llama-bot/releases/tag/v0.33)
+
+---
 ### v0.32
 
-[![Version v0.32](https://travis-ci.org/dwyl/esta.svg?branch=master)](https://github.com/Cubic-Chunks-Development-Team/llama-bot/archive/v0.32.zip)
+#### What's new in v0.32?
+* Merge pull request #12
+#### Download:
 
+[![Version v0.32](https://travis-ci.org/dwyl/esta.svg?branch=master)](https://github.com/Cubic-Chunks-Development-Team/llama-bot/releases/tag/v0.32)
+
+---
 These are the versions we recommend you download. If you want any beta builds, then go [here](https://github.com/Cubic-Chunks-Development-Team/llama-bot/releases).
 
 ## License
