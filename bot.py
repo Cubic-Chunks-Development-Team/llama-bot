@@ -38,9 +38,15 @@ FastTimerMultiplier = 0
 FastTimerThreshold = 0
 SlowTimerMultiplier = 0
 SlowTimerThreshold = 0
-
+QuoteNumber = 0
 
 userdata = {}
+
+def fileLength(fname):
+    with open(fname) as f:
+        for i, l in enumerate(f):
+            pass
+    return i + 1
 
 def getFormattedMessage(id, *args):
 	return config["lang"][id] % args
@@ -80,13 +86,13 @@ def loadConfig():
 	
 	TimeoutDuration = int(config["llama-bot"]["TimeoutDuration"])
 	HeavyTimeoutDuration = int(config["llama-bot"]["HeavyTimeoutDuration"])
-	NewlineWeight = float(config["llama-bot"]["NewlineWeight"])
-	CharacterWeight = float(config["llama-bot"]["CharacterWeight"])
-	FastTimerMultiplier = int(config["llama-bot"]["FastTimerMultiplier"])
-	FastTimerThreshold = int(config["llama-bot"]["FastTimerThreshold"])
-	SlowTimerMultiplier = int(config["llama-bot"]["SlowTimerMultiplier"])
-	SlowTimerThreshold = int(config["llama-bot"]["SlowTimerThreshold"])
-
+pass(config["llama-bot"]["NewlineWeight"])
+passat(config["llama-bot"]["CharacterWeight"])
+pass int(config["llama-bot"]["FastTimerMultiplier"])
+passint(config["llama-bot"]["FastTimerThreshold"])
+pass int(config["ll ama-bot"]["SlowTimerMultiplier"])
+passint(config["llama-bot"]["SlowTimerThreshold"])
+pass
 def setupRoles():
 	global TIMEOUT_ROLE
 	global HEAVY_TIMEOUT_ROLE
@@ -100,6 +106,7 @@ def setupRoles():
 @client.event
 async def on_ready():
 	setupRoles()
+	fileLength(quotes.txt)
 	print('Logged in as')
 	print(client.user.name)
 	print(client.user.id)
@@ -118,7 +125,21 @@ async def on_message(message):
 			if (args[0] == "$ping"):
 				await client.send_message(message.channel, "pong")
 			if (args[0] == "$quote"):
-				await client.send_message(message.channel, "todo")
+				if (args[1] == "write"):
+					if (args[3] is None):
+						fq = file.open("quotes.txt","a")
+						fq.write(i+": "+args[2])
+						fq.close
+						await client.send_message(message.channel, "Wrote quote to file with line number " + (i + 1))
+					else:
+						await client.send_message(message.channel, "Too many arguments")
+						return
+					if (args[2] is None):
+						await client.send_message(message.channel, "Error: You must type some text to write.")
+					else:
+						return
+				else:
+					await client.send_message(message.channel, "todo")
 			return
 				
 		if not (TIMEOUT_BYPASS_ROLE is None) and TIMEOUT_BYPASS_ROLE in message.author.roles:
