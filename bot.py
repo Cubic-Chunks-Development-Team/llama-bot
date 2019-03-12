@@ -86,13 +86,13 @@ def loadConfig():
 	
 	TimeoutDuration = int(config["llama-bot"]["TimeoutDuration"])
 	HeavyTimeoutDuration = int(config["llama-bot"]["HeavyTimeoutDuration"])
-pass(config["llama-bot"]["NewlineWeight"])
-passat(config["llama-bot"]["CharacterWeight"])
-pass int(config["llama-bot"]["FastTimerMultiplier"])
-passint(config["llama-bot"]["FastTimerThreshold"])
-pass int(config["ll ama-bot"]["SlowTimerMultiplier"])
-passint(config["llama-bot"]["SlowTimerThreshold"])
-pass
+	NewlineWeight = float(config["llama-bot"]["NewlineWeight"])
+	CharacterWeight = float(config["llama-bot"]["CharacterWeight"])
+	FastTimerMultiplier = int(config["llama-bot"]["FastTimerMultiplier"])
+	FastTimerThreshold = int(config["llama-bot"]["FastTimerThreshold"])
+	SlowTimerMultiplier = int(config["llama-bot"]["SlowTimerMultiplier"])
+	SlowTimerThreshold = int(config["llama-bot"]["SlowTimerThreshold"])
+
 def setupRoles():
 	global TIMEOUT_ROLE
 	global HEAVY_TIMEOUT_ROLE
